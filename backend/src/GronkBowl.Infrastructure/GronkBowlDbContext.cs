@@ -41,6 +41,8 @@ public class GronkBowlDbContext : DbContext
             entity.Property(p => p.Attributes).AsJson();
             entity.Property(p => p.Traits).AsJson();
             entity.Property(p => p.Contract).AsJson();
+            entity.Property(p => p.Skills).AsJson();
+            entity.Property(p => p.DevelopmentPotential).HasConversion<string>();
         });
     }
 

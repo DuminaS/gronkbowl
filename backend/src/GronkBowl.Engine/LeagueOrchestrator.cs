@@ -32,6 +32,10 @@ public static class LeagueOrchestrator
             var match = MatchEngine.ResolveGame(homeTeam, awayTeam, homeSheet, awaySheet, players, week, seed);
             match.SeasonId = season.Id;
 
+            var gameStats = StatsAggregator.ComputeGameStats(match);
+            var sppSeed = DeriveSeed(season, week, homeTeam.Id, awayTeam.Id, salt: "spp");
+            SppAwarder.AwardSppForGame(gameStats, homeTeam, awayTeam, players, new Random(unchecked((int)sppSeed)));
+
             season.CompletedMatches.Add(match);
             UpdateStandings(season, match);
             results.Add(match);

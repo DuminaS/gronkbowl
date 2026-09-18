@@ -48,6 +48,14 @@ public static class PlayResolver
             if (playerId is { } id && players.TryGetValue(id, out var player))
             {
                 total += player.Attributes.Strength / 25;
+
+                // Block (General) and Guard (Strength) are two names for the same v1 hook -
+                // both categories can reach this skill by design, and a player only needs one
+                // of them to get the bonus.
+                if (player.Skills.Contains(Skill.Block) || player.Skills.Contains(Skill.Guard))
+                {
+                    total += 1;
+                }
             }
         }
 
@@ -66,7 +74,7 @@ public static class PlayResolver
         // line battle is still the dominant term, but it isn't the *only* one, so a
         // high-Agility race retains some rushing value even without a Strength-heavy front.
         var elusiveness = ballCarrier.Attributes.Agility / 30;
-        var evasion = RacialEvasionBonus(ballCarrier, rng);
+        var evasion = RacialEvasionBonus(ballCarrier, rng) + SkillEvasionBonus(ballCarrier, rng);
 
         var jitter = rng.Next(-2, 4);
         var yards = Math.Clamp(2 + lineMargin + elusiveness + evasion + jitter, -5, 25);
@@ -74,7 +82,8 @@ public static class PlayResolver
 
         var fumbleRoll = rng.Next(1, 21);
         var fumbleThreshold = lineMargin < -3 ? 2 : 1;
-        return (yards, fumbleRoll <= fumbleThreshold);
+        fumbleThreshold -= SureHandsBonus(ballCarrier);
+        return (yards, fumbleRoll <= Math.Max(0, fumbleThreshold));
     }
 
     private static (int Yards, bool IsTurnover) ResolvePass(
@@ -93,7 +102,8 @@ public static class PlayResolver
         // Skill scaling is deliberately higher here than the line battle's Strength/25: a
         // finesse race needs a real lever to win a passing down even when it can't win the
         // trenches, or its whole racial identity collapses into "the team that loses."
-        var routeRoll = RollTwoD6(rng) + receiver.Attributes.Agility / 20 + receiver.Attributes.Awareness / 20;
+        var routeRoll = RollTwoD6(rng) + receiver.Attributes.Agility / 20 + receiver.Attributes.Awareness / 20
+            + CatchBonus(receiver);
 
         var coverageRoll = RollTwoD6(rng);
         if (coverageId is { } cId && players.TryGetValue(cId, out var coverage))
@@ -114,7 +124,7 @@ public static class PlayResolver
             return (0, interceptionRoll == 1);
         }
 
-        var yardsAfterCatch = RacialEvasionBonus(receiver, rng);
+        var yardsAfterCatch = RacialEvasionBonus(receiver, rng) + SkillEvasionBonus(receiver, rng);
         var yards = Math.Clamp(4 + (routeRoll - coverageRoll) + yardsAfterCatch, 0, 40);
         yards += BreakawayBonus(receiver, GetPlayer(pursuitDefenderId, players), yards, rng);
         return (yards, false);
@@ -135,7 +145,10 @@ public static class PlayResolver
             return 0;
         }
 
-        var speedGap = ballCarrier.Attributes.Speed - (pursuitDefender?.Attributes.Speed ?? 50);
+        // Tackle represents pursuit angles and technique, not raw Speed - it closes the gap
+        // without needing to touch the defender's actual attribute.
+        var tackleSkillBonus = pursuitDefender is not null && pursuitDefender.Skills.Contains(Skill.Tackle) ? 10 : 0;
+        var speedGap = ballCarrier.Attributes.Speed - (pursuitDefender?.Attributes.Speed ?? 50) - tackleSkillBonus;
         if (speedGap <= 5)
         {
             return 0;
@@ -163,6 +176,34 @@ public static class PlayResolver
         Race.Skitterkin => rng.Next(0, 4) + rng.Next(0, 4),
         _ => 0,
     };
+
+    /// <summary>Dodge and Extra Arms both grant a bonus evasion roll, stacking with whatever
+    /// racial evasion the player already has - a learned skill on top of natural talent.</summary>
+    private static int SkillEvasionBonus(Player ballCarrier, Random rng)
+    {
+        var bonus = 0;
+        if (ballCarrier.Skills.Contains(Skill.Dodge)) bonus += rng.Next(0, 4);
+        if (ballCarrier.Skills.Contains(Skill.ExtraArms)) bonus += rng.Next(0, 4);
+        return bonus;
+    }
+
+    /// <summary>Catch and Extra Arms both bonus the receiver's route roll directly.</summary>
+    private static int CatchBonus(Player receiver)
+    {
+        var bonus = 0;
+        if (receiver.Skills.Contains(Skill.Catch)) bonus += 2;
+        if (receiver.Skills.Contains(Skill.ExtraArms)) bonus += 1;
+        return bonus;
+    }
+
+    /// <summary>Sure Hands and Big Hand both reduce the fumble threshold, stacking.</summary>
+    private static int SureHandsBonus(Player ballCarrier)
+    {
+        var bonus = 0;
+        if (ballCarrier.Skills.Contains(Skill.SureHands)) bonus += 1;
+        if (ballCarrier.Skills.Contains(Skill.BigHand)) bonus += 1;
+        return bonus;
+    }
 
     private static IReadOnlyList<InjuryEvent> ApplyHit(
         Guid? targetId, Guid? hitterId, IReadOnlyDictionary<Guid, Player> players, Random rng)

@@ -25,6 +25,10 @@ public static class CasualtyResolver
         var armorRoll = RollTwoD6(rng)
             + (hitter.Attributes.Strength / 50) + HitterArmorBonus(hitter)
             - (target.Attributes.Durability / 30);
+        if (hitter.Skills.Contains(Skill.MightyBlow))
+        {
+            armorRoll += 1;
+        }
         if (armorRoll < target.ArmorValue)
         {
             return null;
@@ -71,6 +75,7 @@ public static class CasualtyResolver
         if (target.Race == Race.Ironkin) modifier += 1; // Unbreakable
         if (target.Traits.Contains(PersonalTrait.IronWill)) modifier += 1;
         if (target.Traits.Contains(PersonalTrait.InjuryProne)) modifier -= 1;
+        if (hitter.Skills.Contains(Skill.DirtyPlayer)) modifier -= 1;
 
         return modifier;
     }

@@ -30,6 +30,10 @@ public static class DemoRosterBuilder
                     Position = position,
                     Attributes = DraftProspectGenerator.RollAttributes(race, rng),
                     ArmorValue = 9 + rng.Next(0, 3),
+                    DevelopmentPotential = DevelopmentProfiles.RollRandom(rng),
+                    // Demo rosters are veterans, not draft-day rookies - their potential is
+                    // already known, not hidden behind the games-played reveal threshold.
+                    DevelopmentPotentialRevealed = true,
                 };
 
                 playerPool[player.Id] = player;

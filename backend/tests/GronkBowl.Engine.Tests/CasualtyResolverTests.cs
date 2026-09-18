@@ -14,6 +14,7 @@ public class CasualtyResolverTests
             Position = FootballPosition.LB,
             Attributes = new Attributes(Speed: 60, Strength: strength, Agility: 60, Awareness: 60, Durability: durability),
             ArmorValue = armorValue,
+            DevelopmentPotential = DevelopmentPotential.SteadyEddie,
         };
 
     [Fact]

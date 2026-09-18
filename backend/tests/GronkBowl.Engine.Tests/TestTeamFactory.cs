@@ -38,6 +38,8 @@ internal static class TestTeamFactory
                     Position = position,
                     Attributes = DraftProspectGenerator.RollAttributes(race, rng),
                     ArmorValue = 9 + rng.Next(0, 3),
+                    DevelopmentPotential = DevelopmentProfiles.RollRandom(rng),
+                    DevelopmentPotentialRevealed = true,
                 };
                 sharedPlayers[player.Id] = player;
                 ids.Add(player.Id);

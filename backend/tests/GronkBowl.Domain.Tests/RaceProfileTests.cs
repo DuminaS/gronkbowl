@@ -35,7 +35,8 @@ public class RaceProfileTests
             Race = Race.Thornhide,
             Position = FootballPosition.LB,
             Attributes = RaceProfiles.All[Race.Thornhide].CeilingAttributes,
-            ArmorValue = 9
+            ArmorValue = 9,
+            DevelopmentPotential = DevelopmentPotential.SteadyEddie,
         };
 
         Assert.Equal(InjuryStatus.Healthy, player.InjuryStatus);

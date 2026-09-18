@@ -15,6 +15,7 @@ public class RosterTests
             Attributes = RaceProfiles.All[Race.Ironkin].CeilingAttributes,
             ArmorValue = 9,
             InjuryStatus = status,
+            DevelopmentPotential = DevelopmentPotential.SteadyEddie,
         };
 
     [Fact]

@@ -24,4 +24,16 @@ public class Player
     // persists into the next week's lineup decision.
     public bool IsAvailableForLineup =>
         InjuryStatus is InjuryStatus.Healthy or InjuryStatus.Niggling;
+
+    // Blood Bowl-style leveling (Master Design Doc: progression system).
+    public int Level { get; set; } = 1;
+    public int SkillPoints { get; set; }
+    public List<Skill> Skills { get; init; } = new();
+    public bool UsedCareerReroll { get; set; }
+
+    // HC09-style hidden potential. A rookie's true tier exists from day one but isn't shown to
+    // the coach until DevelopmentPotentialRevealed flips - see PlayerProgression.
+    public required DevelopmentPotential DevelopmentPotential { get; init; }
+    public bool DevelopmentPotentialRevealed { get; set; }
+    public int GamesPlayed { get; set; }
 }

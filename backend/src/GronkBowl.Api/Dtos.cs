@@ -5,7 +5,15 @@ public sealed record TeamSummaryDto(Guid Id, string Name, int Gold, int CapSpace
 public sealed record PlayerDto(
     Guid Id, string Name, string Race, string Position,
     int Speed, int Strength, int Agility, int Awareness, int Durability,
-    int ArmorValue, string InjuryStatus, int InjuryWeeksRemaining, List<string> Traits);
+    int ArmorValue, string InjuryStatus, int InjuryWeeksRemaining, List<string> Traits,
+    int Level, int SkillPoints, int? SppNeededForNextLevel, List<string> Skills,
+    string? DevelopmentPotential, bool DevelopmentPotentialRevealed, int GamesPlayed);
+
+public sealed record LevelUpRollDto(
+    int Die1, int Die2, bool IsDoubles, string BaseOutcome,
+    List<string> EligiblePrimarySkills, List<string> EligibleSecondarySkills);
+
+public sealed record ApplyLevelUpRequest(int Die1, int Die2, bool UseSecondarySkill, string? SkillChoice, string? StatChoice);
 
 public sealed record RosterEntryDto(string Position, List<PlayerDto> DepthChart);
 

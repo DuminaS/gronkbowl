@@ -35,6 +35,7 @@ public static class DraftProspectGenerator
                 Position = position,
                 Attributes = RollAttributes(race, rng),
                 ArmorValue = 9 + rng.Next(0, 3),
+                DevelopmentPotential = DevelopmentProfiles.RollRandom(rng),
             };
 
             if (rng.Next(0, 100) < TraitChancePercent)

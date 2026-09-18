@@ -78,6 +78,7 @@ public static class SeasonSimulator
                 Position = position,
                 Attributes = DraftProspectGenerator.RollAttributes(race, rng),
                 ArmorValue = 9 + rng.Next(0, 3),
+                DevelopmentPotential = DevelopmentProfiles.RollRandom(rng),
             };
 
             players[replacement.Id] = replacement;
