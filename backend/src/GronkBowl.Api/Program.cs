@@ -12,9 +12,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<GronkBowlDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+// Dev-only and unauthenticated (no cookies/credentials involved), so any origin is fine here -
+// the frontend gets opened from whatever this machine's LAN IP happens to be that day (a phone
+// on the same Wi-Fi), which would otherwise mean re-hardcoding a CORS origin every session.
 const string FrontendDevCorsPolicy = "FrontendDev";
 builder.Services.AddCors(options => options.AddPolicy(FrontendDevCorsPolicy, policy =>
-    policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod()));
+    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
 var app = builder.Build();
 

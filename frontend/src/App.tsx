@@ -26,7 +26,7 @@ function App() {
       })
       .catch((e) =>
         setError(
-          `Could not reach the API at http://localhost:5091 - is the backend running? (${String(e)})`,
+          `Could not reach the API at http://${window.location.hostname}:5091 - is the backend running, and reachable from this device? (${String(e)})`,
         ),
       );
   }, []);

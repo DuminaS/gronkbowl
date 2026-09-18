@@ -13,7 +13,10 @@ import type {
   TradeResult,
 } from "./types";
 
-const BASE_URL = "http://localhost:5091/api";
+// Use whatever host the page itself was loaded from (localhost on this machine, or this
+// machine's LAN IP when opened from a phone) rather than a hardcoded "localhost" - the API
+// runs on the same machine as the dev server, just on a different port.
+const BASE_URL = `http://${window.location.hostname}:5091/api`;
 
 async function get<T>(path: string): Promise<T> {
   const response = await fetch(`${BASE_URL}${path}`);
