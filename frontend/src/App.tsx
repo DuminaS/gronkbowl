@@ -26,9 +26,7 @@ function App() {
         if (loaded.length > 0) setTeamId(loaded[0].id);
       })
       .catch((e) =>
-        setError(
-          `Could not reach the API at http://${window.location.hostname}:5091 - is the backend running, and reachable from this device? (${String(e)})`,
-        ),
+        setError(`Could not reach the API - is the backend running? (${String(e)})`),
       );
     api.getSeasonStatus().then(setSeasonStatus).catch(() => {});
   }, []);

@@ -17,10 +17,10 @@ import type {
   TradeResult,
 } from "./types";
 
-// Use whatever host the page itself was loaded from (localhost on this machine, or this
-// machine's LAN IP when opened from a phone) rather than a hardcoded "localhost" - the API
-// runs on the same machine as the dev server, just on a different port.
-const BASE_URL = `http://${window.location.hostname}:5091/api`;
+// Relative, not an absolute host:port - Vite's dev server proxies /api to the API process
+// itself (see vite.config.ts), so the browser only ever talks to whatever origin loaded the
+// page (localhost, a LAN IP, or a tunnel URL) and never needs to guess the API's own address.
+const BASE_URL = "/api";
 
 async function get<T>(path: string): Promise<T> {
   const response = await fetch(`${BASE_URL}${path}`);
