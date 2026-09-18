@@ -83,6 +83,54 @@ export interface MatchResult {
   boxScore: string;
 }
 
+export interface PlayResult {
+  playIndex: number;
+  offensePlayName: string;
+  defensePlayName: string;
+  isPassPlay: boolean;
+  yardsGained: number;
+  isTurnover: boolean;
+  isScore: boolean;
+  injuryDescriptions: string[];
+  quarter: number;
+  down: number;
+  distanceToGo: number;
+  fieldPosition: number;
+  possessionTeamId: string;
+  homeScoreAfter: number;
+  awayScoreAfter: number;
+}
+
+export interface BoxScoreRow {
+  playerId: string;
+  playerName: string;
+  race: string;
+  position: string;
+  rushingAttempts: number;
+  rushingYards: number;
+  rushingTouchdowns: number;
+  receptions: number;
+  receivingYards: number;
+  receivingTouchdowns: number;
+  tacklesOrHits: number;
+  turnoversForced: number;
+  injuriesCaused: number;
+  timesInjured: number;
+}
+
+export interface MatchDetail {
+  matchId: string;
+  week: number;
+  homeTeamId: string;
+  homeTeamName: string;
+  awayTeamId: string;
+  awayTeamName: string;
+  homeScore: number;
+  awayScore: number;
+  plays: PlayResult[];
+  boxScore: BoxScoreRow[];
+}
+
 export interface DraftState {
   id: string;
   onTheClockTeamId: string | null;

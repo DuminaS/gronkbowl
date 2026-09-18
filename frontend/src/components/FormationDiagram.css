@@ -1,0 +1,68 @@
+.formation-diagram {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--field);
+  background-image: repeating-linear-gradient(
+    to top,
+    var(--field-line) 0,
+    var(--field-line) 1px,
+    transparent 1px,
+    transparent 12.5%
+  );
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.formation-los {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 70%;
+  height: 2px;
+  background: var(--gold);
+  opacity: 0.8;
+}
+
+.formation-dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.formation-dot-label {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--heading);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-h);
+  border: 2px solid var(--text-h);
+}
+
+.formation-dot.offense .formation-dot-label {
+  background: var(--accent);
+  border-color: var(--accent-bg);
+}
+
+.formation-dot.defense .formation-dot-label {
+  background: var(--danger);
+  border-color: var(--danger-bg);
+}
+
+.formation-dot-role {
+  font-size: 9px;
+  color: var(--text-h);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 0 3px;
+  border-radius: 2px;
+  white-space: nowrap;
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import type { MatchResult, ScheduledGame, StandingsRow } from "../types";
+import { MatchViewer } from "./MatchViewer";
 
 export function LeagueView({ teamNames }: { teamNames: Record<string, string> }) {
   const [standings, setStandings] = useState<StandingsRow[]>([]);
@@ -8,6 +9,7 @@ export function LeagueView({ teamNames }: { teamNames: Record<string, string> })
   const [week, setWeek] = useState(1);
   const [results, setResults] = useState<MatchResult[]>([]);
   const [status, setStatus] = useState<string | null>(null);
+  const [watchingMatchId, setWatchingMatchId] = useState<string | null>(null);
 
   function refresh() {
     api.getStandings().then(setStandings);
@@ -22,6 +24,9 @@ export function LeagueView({ teamNames }: { teamNames: Record<string, string> })
       const weekResults = await api.resolveWeek(week);
       setResults(weekResults);
       setStatus(`Week ${week} resolved.`);
+      if (weekResults.length > 0) {
+        setWatchingMatchId(weekResults[0].matchId);
+      }
       refresh();
     } catch (e) {
       setStatus(`Failed to resolve week ${week}: ${String(e)}`);
@@ -88,6 +93,8 @@ export function LeagueView({ teamNames }: { teamNames: Record<string, string> })
         {status && <span className="status">{status}</span>}
       </section>
 
+      {watchingMatchId && <MatchViewer matchId={watchingMatchId} onClose={() => setWatchingMatchId(null)} />}
+
       {results.length > 0 && (
         <section>
           <h3>Results</h3>
@@ -97,8 +104,9 @@ export function LeagueView({ teamNames }: { teamNames: Record<string, string> })
                 {teamNames[match.homeTeamId] ?? match.homeTeamId} {match.homeScore} - {match.awayScore}{" "}
                 {teamNames[match.awayTeamId] ?? match.awayTeamId}
               </h4>
-              <pre className="summary-text">{match.summary}</pre>
-              <pre className="summary-text">{match.boxScore}</pre>
+              <div className="match-result-actions">
+                <button onClick={() => setWatchingMatchId(match.matchId)}>Watch</button>
+              </div>
             </div>
           ))}
         </section>

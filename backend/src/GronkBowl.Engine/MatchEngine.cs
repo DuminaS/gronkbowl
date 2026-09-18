@@ -62,6 +62,14 @@ public static class MatchEngine
         Match match, GameState state, Play offensePlay, Play defensePlay, PlayOutcome outcome,
         Guid homeTeamId, int playIndex)
     {
+        // Captured before state mutates below, so the log reflects the situation the coaches
+        // were actually calling plays into - the pre-snap read, not the post-play result.
+        var quarter = state.Quarter;
+        var down = state.Down;
+        var distanceToGo = state.DistanceToGo;
+        var fieldPosition = state.FieldPosition;
+        var possessionTeamId = state.PossessionTeamId;
+
         PlayResult BuildResult(bool isTurnover, bool isScore) => new(
             playIndex,
             offensePlay.Id,
@@ -72,7 +80,14 @@ public static class MatchEngine
             outcome.Yards,
             isTurnover,
             isScore,
-            outcome.InjuryEvents);
+            outcome.InjuryEvents,
+            quarter,
+            down,
+            distanceToGo,
+            fieldPosition,
+            possessionTeamId,
+            state.HomeScore,
+            state.AwayScore);
 
         if (outcome.IsTurnover)
         {
@@ -92,6 +107,11 @@ public static class MatchEngine
         }
 
         match.EventLog.Add(BuildResult(isTurnover: false, isScore: false));
+
+        // A stuffed run/sack can push newFieldPosition below the offense's own goal line - no
+        // safety mechanic exists yet, so the drive is simply stopped at the 1 rather than let
+        // FieldPosition go negative and corrupt every play recorded after it.
+        newFieldPosition = Math.Clamp(newFieldPosition, 1, 99);
 
         if (outcome.Yards >= state.DistanceToGo)
         {

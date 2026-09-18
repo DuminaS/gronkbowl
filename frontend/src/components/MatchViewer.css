@@ -1,0 +1,234 @@
+.match-viewer {
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--gold);
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 20px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow);
+}
+
+.match-viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.match-viewer-header h3 {
+  margin: 0;
+}
+
+.scoreboard-bug {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.scoreboard-team {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+}
+
+.scoreboard-team-name {
+  font-family: var(--heading);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-size: 13px;
+  color: var(--text-h);
+}
+
+.scoreboard-score {
+  font-family: var(--heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.scoreboard-situation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 16px;
+  background: var(--bg-raised);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  min-width: 140px;
+}
+
+.scoreboard-quarter {
+  font-family: var(--heading);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.scoreboard-down {
+  font-family: var(--heading);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.scoreboard-spot {
+  font-size: 11px;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field-strip {
+  margin-bottom: 10px;
+}
+
+.field-strip-track {
+  position: relative;
+  height: 28px;
+  background: var(--field);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--field-line) 0,
+    var(--field-line) 1px,
+    transparent 1px,
+    transparent 10%
+  );
+}
+
+.field-strip-endzone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10%;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.field-strip-endzone.left {
+  left: 0;
+}
+
+.field-strip-endzone.right {
+  right: 0;
+}
+
+.field-strip-marker {
+  position: absolute;
+  top: -4px;
+  width: 10px;
+  height: 36px;
+  background: var(--gold);
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: left 0.5s ease;
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.7);
+}
+
+.field-strip-caption {
+  font-size: 12px;
+  color: var(--text);
+  margin-top: 4px;
+  text-align: center;
+}
+
+.event-banner {
+  font-family: var(--heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.event-banner.score {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.event-banner.turnover {
+  background: var(--gold-bg);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+}
+
+.event-banner.injury {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.event-banner-detail {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.play-description {
+  font-size: 14px;
+  margin-bottom: 12px;
+  min-height: 20px;
+}
+
+.match-viewer-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.drive-log {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  padding: 6px 10px;
+  margin-bottom: 16px;
+}
+
+.drive-log-row {
+  display: flex;
+  gap: 10px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.drive-log-row:last-of-type {
+  border-bottom: none;
+}
+
+.drive-log-row.current {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.drive-log-situation {
+  flex: 0 0 150px;
+  color: var(--accent);
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+
+.drive-log-text {
+  flex: 1;
+}
+
+.box-score-table td,
+.box-score-table th {
+  font-size: 12px;
+}

@@ -92,4 +92,26 @@ public class LeagueController : ControllerBase
             return new MatchResultDto(match.Id, match.Week, match.HomeTeamId, match.AwayTeamId, match.HomeScore, match.AwayScore, summary, boxScore);
         }).ToList();
     }
+
+    /// <summary>
+    /// The structured, play-by-play view of an already-resolved match - situational state
+    /// (down/distance/field position/quarter/score) per play, for a client to step through or
+    /// animate, rather than the flattened text summary/box score from ResolveWeek.
+    /// </summary>
+    [HttpGet("matches/{matchId:guid}")]
+    public async Task<ActionResult<MatchDetailDto>> GetMatch(Guid matchId)
+    {
+        var match = await _db.Matches.FirstOrDefaultAsync(m => m.Id == matchId);
+        if (match is null)
+        {
+            return NotFound();
+        }
+
+        var teams = await _db.Teams.Include(t => t.Playbook)
+            .Where(t => t.Id == match.HomeTeamId || t.Id == match.AwayTeamId)
+            .ToDictionaryAsync(t => t.Id);
+        var players = await _db.Players.ToDictionaryAsync(p => p.Id);
+
+        return DtoMapping.ToDetailDto(match, teams[match.HomeTeamId], teams[match.AwayTeamId], players);
+    }
 }

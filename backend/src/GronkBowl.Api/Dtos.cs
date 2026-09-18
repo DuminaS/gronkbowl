@@ -39,6 +39,23 @@ public sealed record ScheduledGameDto(int Week, Guid HomeTeamId, string HomeTeam
 public sealed record MatchResultDto(
     Guid MatchId, int Week, Guid HomeTeamId, Guid AwayTeamId, int HomeScore, int AwayScore, string Summary, string BoxScore);
 
+public sealed record PlayResultDto(
+    int PlayIndex, string OffensePlayName, string DefensePlayName, bool IsPassPlay,
+    int YardsGained, bool IsTurnover, bool IsScore, List<string> InjuryDescriptions,
+    int Quarter, int Down, int DistanceToGo, int FieldPosition, Guid PossessionTeamId,
+    int HomeScoreAfter, int AwayScoreAfter);
+
+public sealed record BoxScoreRowDto(
+    Guid PlayerId, string PlayerName, string Race, string Position,
+    int RushingAttempts, int RushingYards, int RushingTouchdowns,
+    int Receptions, int ReceivingYards, int ReceivingTouchdowns,
+    int TacklesOrHits, int TurnoversForced, int InjuriesCaused, int TimesInjured);
+
+public sealed record MatchDetailDto(
+    Guid MatchId, int Week,
+    Guid HomeTeamId, string HomeTeamName, Guid AwayTeamId, string AwayTeamName,
+    int HomeScore, int AwayScore, List<PlayResultDto> Plays, List<BoxScoreRowDto> BoxScore);
+
 public sealed record DraftStateDto(
     Guid Id, Guid? OnTheClockTeamId, int OverallPickNumber, int TotalPicks, bool IsComplete, List<PlayerDto> AvailableProspects);
 

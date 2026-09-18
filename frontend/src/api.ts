@@ -2,6 +2,7 @@ import type {
   CallSheetDto,
   DraftPickResult,
   DraftState,
+  MatchDetail,
   MatchResult,
   PlayDto,
   PlayerDto,
@@ -66,6 +67,7 @@ export const api = {
   getStandings: () => get<StandingsRow[]>("/league/standings"),
   getSchedule: () => get<ScheduledGame[]>("/league/schedule"),
   resolveWeek: (week: number) => post<MatchResult[]>(`/league/weeks/${week}/resolve`),
+  getMatch: (matchId: string) => get<MatchDetail>(`/league/matches/${matchId}`),
 
   getDraft: () => get<DraftState | null>("/draft"),
   startDraft: (prospectCount: number, rounds: number) =>

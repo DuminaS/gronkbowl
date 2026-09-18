@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import type { PlayDto } from "../types";
+import { FormationDiagram } from "./FormationDiagram";
 
 export function PlaybookView({ teamId }: { teamId: string }) {
   const [plays, setPlays] = useState<PlayDto[]>([]);
@@ -29,13 +30,7 @@ export function PlaybookView({ teamId }: { teamId: string }) {
             <p>
               Featured: {play.primaryPosition} {play.isPassPlay ? "(pass)" : "(run)"}
             </p>
-            <ul>
-              {play.assignments.map((a, i) => (
-                <li key={i}>
-                  {a.slot} - {a.role}
-                </li>
-              ))}
-            </ul>
+            <FormationDiagram assignments={play.assignments} isPassPlay={play.isPassPlay} />
           </div>
         ))}
       </div>
