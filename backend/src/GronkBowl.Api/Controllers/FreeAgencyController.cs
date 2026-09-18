@@ -42,6 +42,16 @@ public class FreeAgencyController : ControllerBase
     [HttpPost("{playerId:guid}/sign")]
     public async Task<ActionResult<PlayerDto>> Sign(Guid playerId, [FromBody] SignFreeAgentRequest request)
     {
+        var season = await _db.Seasons.FirstOrDefaultAsync();
+        if (season is not null)
+        {
+            var completedGames = await _db.Matches.CountAsync(m => m.SeasonId == season.Id);
+            if (!SeasonPhaseCalculator.IsRegularSeasonComplete(season, completedGames))
+            {
+                return Conflict("Free agency opens once the regular season is complete.");
+            }
+        }
+
         var player = await _db.Players.FindAsync(playerId);
         var team = await _db.Teams.FindAsync(request.TeamId);
         if (player is null || team is null)

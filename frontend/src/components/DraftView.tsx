@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import type { DraftState, TeamSummary } from "../types";
 
-export function DraftView({ teams, teamId }: { teams: TeamSummary[]; teamId: string }) {
+export function DraftView({ teams, teamId, seasonComplete }: { teams: TeamSummary[]; teamId: string; seasonComplete: boolean }) {
   const [draft, setDraft] = useState<DraftState | null>(null);
   const [status, setStatus] = useState<string | null>(null);
 
@@ -40,8 +40,14 @@ export function DraftView({ teams, teamId }: { teams: TeamSummary[]; teamId: str
   if (!draft) {
     return (
       <div className="draft-view">
-        <p>No draft in progress.</p>
-        <button onClick={handleStart}>Start Draft</button>
+        {seasonComplete ? (
+          <>
+            <p>No draft in progress.</p>
+            <button onClick={handleStart}>Start Draft</button>
+          </>
+        ) : (
+          <p className="hint">The rookie draft is an offseason event - it opens once every game in the regular season has been played.</p>
+        )}
         {status && <p className="status">{status}</p>}
       </div>
     );

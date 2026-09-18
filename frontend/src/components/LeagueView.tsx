@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import type { MatchResult, ScheduledGame, StandingsRow } from "../types";
 import { MatchViewer } from "./MatchViewer";
+import { LiveDownView } from "./LiveDownView";
 
-export function LeagueView({ teamNames }: { teamNames: Record<string, string> }) {
+export function LeagueView({ teamNames, teamId }: { teamNames: Record<string, string>; teamId: string }) {
   const [standings, setStandings] = useState<StandingsRow[]>([]);
   const [schedule, setSchedule] = useState<ScheduledGame[]>([]);
   const [week, setWeek] = useState(1);
   const [results, setResults] = useState<MatchResult[]>([]);
   const [status, setStatus] = useState<string | null>(null);
   const [watchingMatchId, setWatchingMatchId] = useState<string | null>(null);
+  const [playingMatchId, setPlayingMatchId] = useState<string | null>(null);
 
   function refresh() {
     api.getStandings().then(setStandings);
@@ -18,18 +20,25 @@ export function LeagueView({ teamNames }: { teamNames: Record<string, string> })
 
   useEffect(refresh, []);
 
+  async function handlePlay(game: ScheduledGame) {
+    setStatus(null);
+    try {
+      const { matchId } = await api.startLiveMatch(game.week, game.homeTeamId, game.awayTeamId);
+      setPlayingMatchId(matchId);
+    } catch (e) {
+      setStatus(`Could not start this game: ${String(e)}`);
+    }
+  }
+
   async function handleResolveWeek() {
-    setStatus(`Resolving week ${week}...`);
+    setStatus(`Simulating week ${week} instantly...`);
     try {
       const weekResults = await api.resolveWeek(week);
       setResults(weekResults);
-      setStatus(`Week ${week} resolved.`);
-      if (weekResults.length > 0) {
-        setWatchingMatchId(weekResults[0].matchId);
-      }
+      setStatus(`Week ${week} simulated.`);
       refresh();
     } catch (e) {
-      setStatus(`Failed to resolve week ${week}: ${String(e)}`);
+      setStatus(`Failed to simulate week ${week}: ${String(e)}`);
     }
   }
 
@@ -67,6 +76,7 @@ export function LeagueView({ teamNames }: { teamNames: Record<string, string> })
               <th>Week</th>
               <th>Matchup</th>
               <th>Played</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -77,19 +87,34 @@ export function LeagueView({ teamNames }: { teamNames: Record<string, string> })
                   {game.homeTeamName} vs {game.awayTeamName}
                 </td>
                 <td>{game.played ? "Yes" : "No"}</td>
+                <td>
+                  {!game.played && (game.homeTeamId === teamId || game.awayTeamId === teamId) && (
+                    <button onClick={() => handlePlay(game)}>Play</button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </section>
 
+      {playingMatchId && (
+        <LiveDownView matchId={playingMatchId} teamId={teamId} onClose={() => { setPlayingMatchId(null); refresh(); }} />
+      )}
+
       <section>
-        <h3>Resolve a Week</h3>
+        <h3>Instant-Simulate a Week</h3>
+        <p className="hint">
+          Skips playing it down by down - resolves every game for the week at once. Useful for
+          weeks nobody wants to play live, or for catching up quickly while testing.
+        </p>
         <label>
           Week{" "}
           <input type="number" min={1} value={week} onChange={(e) => setWeek(Number(e.target.value))} />
         </label>
-        <button onClick={handleResolveWeek}>Resolve Week</button>
+        <button className="secondary" onClick={handleResolveWeek}>
+          Simulate Week Instantly
+        </button>
         {status && <span className="status">{status}</span>}
       </section>
 

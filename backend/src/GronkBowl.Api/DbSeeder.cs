@@ -42,6 +42,27 @@ public static class DbSeeder
         var freeAgents = DraftProspectGenerator.GenerateClass(12, rng);
         db.Players.AddRange(freeAgents);
 
+        // One starter folder per side of the ball per team, holding every play they start with -
+        // so the live-down screen has something to pick from immediately. Coaches can rename,
+        // split, or reorganize these however they want from here.
+        foreach (var team in teams)
+        {
+            db.PlaybookFolders.Add(new PlaybookFolder
+            {
+                TeamId = team.Id,
+                Category = PlayCategory.Offense,
+                Name = "Base Offense",
+                PlayIds = team.Playbook.Where(p => p.Category == PlayCategory.Offense).Select(p => p.Id).ToList(),
+            });
+            db.PlaybookFolders.Add(new PlaybookFolder
+            {
+                TeamId = team.Id,
+                Category = PlayCategory.Defense,
+                Name = "Base Defense",
+                PlayIds = team.Playbook.Where(p => p.Category == PlayCategory.Defense).Select(p => p.Id).ToList(),
+            });
+        }
+
         db.SaveChanges();
     }
 }

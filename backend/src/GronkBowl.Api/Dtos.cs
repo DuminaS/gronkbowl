@@ -36,6 +36,8 @@ public sealed record StandingsRowDto(Guid TeamId, string TeamName, int Wins, int
 
 public sealed record ScheduledGameDto(int Week, Guid HomeTeamId, string HomeTeamName, Guid AwayTeamId, string AwayTeamName, bool Played);
 
+public sealed record SeasonStatusDto(int TotalGames, int CompletedGames, int? NextUnplayedWeek, bool IsRegularSeasonComplete);
+
 public sealed record MatchResultDto(
     Guid MatchId, int Week, Guid HomeTeamId, Guid AwayTeamId, int HomeScore, int AwayScore, string Summary, string BoxScore);
 
@@ -70,3 +72,28 @@ public sealed record SignFreeAgentRequest(Guid TeamId, int AnnualGold, int Years
 public sealed record TradeRequest(Guid TeamAId, Guid PlayerAId, Guid TeamBId, Guid PlayerBId);
 
 public sealed record TradeResultDto(bool Success, string Message);
+
+public sealed record PlaybookFolderDto(Guid Id, Guid TeamId, string Category, string Name, List<Guid> PlayIds);
+
+public sealed record CreateFolderRequest(string Category, string Name);
+
+public sealed record UpdateFolderRequest(string Name, List<Guid> PlayIds);
+
+public sealed record StartLiveMatchRequest(int Week, Guid HomeTeamId, Guid AwayTeamId);
+
+/// <summary>Everything a coach needs to make (or watch someone else make) the call for the
+/// down a live match is currently waiting on, scoped to whichever team is asking.</summary>
+public sealed record CurrentDownDto(
+    Guid MatchId, int Week,
+    Guid HomeTeamId, string HomeTeamName, Guid AwayTeamId, string AwayTeamName,
+    int HomeScore, int AwayScore, bool IsResolved,
+    int Quarter, int Down, int DistanceToGo, int FieldPosition, Guid PossessionTeamId,
+    string SituationHint,
+    string YourSide, bool YouHaveSubmitted, bool OpponentHasSubmitted,
+    List<PlaybookFolderDto> YourFolders, List<PlayDto> YourEligiblePlays);
+
+public sealed record SubmitLivePlayRequest(Guid TeamId, Guid PlayId);
+
+public sealed record SubmitLivePlayResultDto(bool DownResolved, PlayResultDto? ResolvedPlay, CurrentDownDto CurrentDown);
+
+public sealed record LiveMatchStartedDto(Guid MatchId);

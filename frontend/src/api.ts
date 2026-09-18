@@ -1,14 +1,18 @@
 import type {
   CallSheetDto,
+  CurrentDown,
   DraftPickResult,
   DraftState,
   MatchDetail,
   MatchResult,
   PlayDto,
+  PlaybookFolder,
   PlayerDto,
   RosterEntry,
   ScheduledGame,
+  SeasonStatus,
   StandingsRow,
+  SubmitLivePlayResult,
   TeamSummary,
   TradeResult,
 } from "./types";
@@ -51,6 +55,13 @@ async function post<T>(path: string, body?: unknown): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+async function del(path: string): Promise<void> {
+  const response = await fetch(`${BASE_URL}${path}`, { method: "DELETE" });
+  if (!response.ok) {
+    throw new Error(`DELETE ${path} failed: ${response.status}`);
+  }
+}
+
 export const api = {
   getTeams: () => get<TeamSummary[]>("/teams"),
   getRoster: (teamId: string) => get<RosterEntry[]>(`/teams/${teamId}/roster`),
@@ -69,8 +80,25 @@ export const api = {
     }),
   getStandings: () => get<StandingsRow[]>("/league/standings"),
   getSchedule: () => get<ScheduledGame[]>("/league/schedule"),
+  getSeasonStatus: () => get<SeasonStatus>("/league/status"),
   resolveWeek: (week: number) => post<MatchResult[]>(`/league/weeks/${week}/resolve`),
   getMatch: (matchId: string) => get<MatchDetail>(`/league/matches/${matchId}`),
+
+  getFolders: (teamId: string) => get<PlaybookFolder[]>(`/teams/${teamId}/folders`),
+  createFolder: (teamId: string, category: "Offense" | "Defense", name: string) =>
+    post<PlaybookFolder>(`/teams/${teamId}/folders`, { category, name }),
+  updateFolder: (teamId: string, folderId: string, name: string, playIds: string[]) =>
+    put<PlaybookFolder>(`/teams/${teamId}/folders/${folderId}`, { name, playIds }),
+  deleteFolder: (teamId: string, folderId: string) => del(`/teams/${teamId}/folders/${folderId}`),
+
+  startLiveMatch: (week: number, homeTeamId: string, awayTeamId: string) =>
+    post<{ matchId: string }>("/league/matches/live/start", { week, homeTeamId, awayTeamId }),
+  getCurrentDown: (matchId: string, teamId: string) =>
+    get<CurrentDown>(`/league/matches/${matchId}/current-down?teamId=${teamId}`),
+  submitLivePlay: (matchId: string, teamId: string, playId: string) =>
+    post<SubmitLivePlayResult>(`/league/matches/${matchId}/submit-play`, { teamId, playId }),
+  forceResolveDown: (matchId: string) =>
+    post<SubmitLivePlayResult>(`/league/matches/${matchId}/force-resolve`),
 
   getDraft: () => get<DraftState | null>("/draft"),
   startDraft: (prospectCount: number, rounds: number) =>

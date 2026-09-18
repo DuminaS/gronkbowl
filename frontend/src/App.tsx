@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { api } from "./api";
-import type { TeamSummary } from "./types";
+import type { SeasonStatus, TeamSummary } from "./types";
 import { RosterView } from "./components/RosterView";
 import { PlaybookView } from "./components/PlaybookView";
-import { CallSheetBuilder } from "./components/CallSheetBuilder";
+import { PlaybookOrganizer } from "./components/PlaybookOrganizer";
 import { LeagueView } from "./components/LeagueView";
 import { DraftView } from "./components/DraftView";
 import { MarketView } from "./components/MarketView";
 
-type Tab = "roster" | "playbook" | "callsheet" | "league" | "draft" | "market";
+type Tab = "roster" | "playbook" | "folders" | "league" | "draft" | "market";
 
 function App() {
   const [teams, setTeams] = useState<TeamSummary[]>([]);
   const [teamId, setTeamId] = useState<string>("");
   const [tab, setTab] = useState<Tab>("roster");
   const [error, setError] = useState<string | null>(null);
+  const [seasonStatus, setSeasonStatus] = useState<SeasonStatus | null>(null);
 
   useEffect(() => {
     api
@@ -29,10 +30,12 @@ function App() {
           `Could not reach the API at http://${window.location.hostname}:5091 - is the backend running, and reachable from this device? (${String(e)})`,
         ),
       );
+    api.getSeasonStatus().then(setSeasonStatus).catch(() => {});
   }, []);
 
   const teamNames = Object.fromEntries(teams.map((t) => [t.id, t.name]));
   const activeTeam = teams.find((t) => t.id === teamId);
+  const isOffseason = seasonStatus?.isRegularSeasonComplete ?? false;
 
   return (
     <div className="app">
@@ -61,6 +64,13 @@ function App() {
                 Gold: {activeTeam.gold} | Cap space: {activeTeam.capSpace}
               </span>
             )}
+            {seasonStatus && (
+              <span className="team-meta">
+                {isOffseason
+                  ? "Offseason - Draft & Free Agency open"
+                  : `Regular season - ${seasonStatus.completedGames}/${seasonStatus.totalGames} games played`}
+              </span>
+            )}
           </div>
 
           <nav className="tabs">
@@ -70,8 +80,8 @@ function App() {
             <button className={tab === "playbook" ? "active" : ""} onClick={() => setTab("playbook")}>
               Playbook
             </button>
-            <button className={tab === "callsheet" ? "active" : ""} onClick={() => setTab("callsheet")}>
-              Call Sheet
+            <button className={tab === "folders" ? "active" : ""} onClick={() => setTab("folders")}>
+              Folders
             </button>
             <button className={tab === "draft" ? "active" : ""} onClick={() => setTab("draft")}>
               Draft
@@ -87,10 +97,10 @@ function App() {
           <main>
             {teamId && tab === "roster" && <RosterView teamId={teamId} />}
             {teamId && tab === "playbook" && <PlaybookView teamId={teamId} />}
-            {teamId && tab === "callsheet" && <CallSheetBuilder teamId={teamId} />}
-            {teamId && tab === "draft" && <DraftView teams={teams} teamId={teamId} />}
-            {teamId && tab === "market" && <MarketView teams={teams} teamId={teamId} />}
-            {tab === "league" && <LeagueView teamNames={teamNames} />}
+            {teamId && tab === "folders" && <PlaybookOrganizer teamId={teamId} />}
+            {teamId && tab === "draft" && <DraftView teams={teams} teamId={teamId} seasonComplete={isOffseason} />}
+            {teamId && tab === "market" && <MarketView teams={teams} teamId={teamId} seasonComplete={isOffseason} />}
+            {tab === "league" && <LeagueView teamNames={teamNames} teamId={teamId} />}
           </main>
         </>
       )}

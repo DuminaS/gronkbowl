@@ -58,7 +58,53 @@ public static class MatchEngine
         return match;
     }
 
-    private static int RecordPlay(
+    /// <summary>Rebuilds the transient GameState a live match needs mid-resolution from the
+    /// subset of it a Match persists between requests (see Match's live-state fields).</summary>
+    public static GameState ToGameState(Match match) => new()
+    {
+        PossessionTeamId = match.PossessionTeamId,
+        DefendingTeamId = match.PossessionTeamId == match.HomeTeamId ? match.AwayTeamId : match.HomeTeamId,
+        Quarter = match.Quarter,
+        PlaysRemainingInQuarter = match.PlaysRemainingInQuarter,
+        Down = match.Down,
+        DistanceToGo = match.DistanceToGo,
+        FieldPosition = match.FieldPosition,
+        HomeScore = match.HomeScore,
+        AwayScore = match.AwayScore,
+    };
+
+    /// <summary>Writes a mutated GameState back onto the Match fields that persist it between
+    /// requests, and flags the match resolved once the clock runs out.</summary>
+    public static void SyncFromGameState(Match match, GameState state)
+    {
+        match.Quarter = state.Quarter;
+        match.PlaysRemainingInQuarter = state.PlaysRemainingInQuarter;
+        match.Down = state.Down;
+        match.DistanceToGo = state.DistanceToGo;
+        match.FieldPosition = state.FieldPosition;
+        match.PossessionTeamId = state.PossessionTeamId;
+        match.HomeScore = state.HomeScore;
+        match.AwayScore = state.AwayScore;
+        match.IsResolved = state.IsGameOver;
+    }
+
+    /// <summary>
+    /// Resolves one already-decided down (both an offense and a defense play in hand) against
+    /// the given state, appending the result to the match's event log and advancing state/clock
+    /// exactly as the whole-game batch loop above does per iteration - shared by
+    /// LiveMatchOrchestrator so a live, one-down-at-a-time game and an instantly-simulated whole
+    /// game can never drift into two different down/distance/scoring behaviors.
+    /// </summary>
+    public static void ResolveOneDown(
+        Match match, GameState state, Play offensePlay, Team offenseTeam, Play defensePlay, Team defenseTeam,
+        IReadOnlyDictionary<Guid, Player> players, Random rng)
+    {
+        var outcome = PlayResolver.Resolve(offensePlay, offenseTeam, defensePlay, defenseTeam, players, rng);
+        RecordPlay(match, state, offensePlay, defensePlay, outcome, match.HomeTeamId, match.EventLog.Count);
+        state.AdvanceClock();
+    }
+
+    internal static int RecordPlay(
         Match match, GameState state, Play offensePlay, Play defensePlay, PlayOutcome outcome,
         Guid homeTeamId, int playIndex)
     {

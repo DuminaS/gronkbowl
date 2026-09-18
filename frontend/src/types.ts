@@ -151,3 +151,47 @@ export interface TradeResult {
   success: boolean;
   message: string;
 }
+
+export interface SeasonStatus {
+  totalGames: number;
+  completedGames: number;
+  nextUnplayedWeek: number | null;
+  isRegularSeasonComplete: boolean;
+}
+
+export interface PlaybookFolder {
+  id: string;
+  teamId: string;
+  category: "Offense" | "Defense";
+  name: string;
+  playIds: string[];
+}
+
+export interface CurrentDown {
+  matchId: string;
+  week: number;
+  homeTeamId: string;
+  homeTeamName: string;
+  awayTeamId: string;
+  awayTeamName: string;
+  homeScore: number;
+  awayScore: number;
+  isResolved: boolean;
+  quarter: number;
+  down: number;
+  distanceToGo: number;
+  fieldPosition: number;
+  possessionTeamId: string;
+  situationHint: string;
+  yourSide: "Offense" | "Defense";
+  youHaveSubmitted: boolean;
+  opponentHasSubmitted: boolean;
+  yourFolders: PlaybookFolder[];
+  yourEligiblePlays: PlayDto[];
+}
+
+export interface SubmitLivePlayResult {
+  downResolved: boolean;
+  resolvedPlay: PlayResult | null;
+  currentDown: CurrentDown;
+}

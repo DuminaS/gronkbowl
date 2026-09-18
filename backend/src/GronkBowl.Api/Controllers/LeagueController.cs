@@ -41,11 +41,7 @@ public class LeagueController : ControllerBase
         }
 
         var teams = await _db.Teams.ToDictionaryAsync(t => t.Id);
-        var playedWeeks = await _db.Matches
-            .Where(m => m.SeasonId == season.Id)
-            .Select(m => new { m.Week, m.HomeTeamId, m.AwayTeamId })
-            .ToListAsync();
-        var playedSet = playedWeeks.Select(m => (m.Week, m.HomeTeamId, m.AwayTeamId)).ToHashSet();
+        var playedSet = await PlayedGamesSet(season.Id);
 
         return season.Schedule
             .Select(game => new ScheduledGameDto(
@@ -56,6 +52,36 @@ public class LeagueController : ControllerBase
                 teams[game.AwayTeamId].Name,
                 playedSet.Contains((game.Week, game.HomeTeamId, game.AwayTeamId))))
             .ToList();
+    }
+
+    /// <summary>
+    /// Whether the regular season is done and the Draft/Free Agency are open - the Draft and
+    /// Free Agency controllers re-check this themselves before acting (this endpoint just lets
+    /// the frontend show the right thing instead of a coach hitting a 409 blind).
+    /// </summary>
+    [HttpGet("status")]
+    public async Task<ActionResult<SeasonStatusDto>> Status()
+    {
+        var season = await _db.Seasons.FirstOrDefaultAsync();
+        if (season is null)
+        {
+            return new SeasonStatusDto(0, 0, null, false);
+        }
+
+        var playedSet = await PlayedGamesSet(season.Id);
+        var nextUnplayedWeek = SeasonPhaseCalculator.NextUnplayedWeek(season, playedSet);
+        var isComplete = SeasonPhaseCalculator.IsRegularSeasonComplete(season, playedSet.Count);
+
+        return new SeasonStatusDto(season.Schedule.Count, playedSet.Count, nextUnplayedWeek, isComplete);
+    }
+
+    private async Task<HashSet<(int Week, Guid HomeTeamId, Guid AwayTeamId)>> PlayedGamesSet(Guid seasonId)
+    {
+        var playedGames = await _db.Matches
+            .Where(m => m.SeasonId == seasonId)
+            .Select(m => new { m.Week, m.HomeTeamId, m.AwayTeamId })
+            .ToListAsync();
+        return playedGames.Select(m => (m.Week, m.HomeTeamId, m.AwayTeamId)).ToHashSet();
     }
 
     /// <summary>

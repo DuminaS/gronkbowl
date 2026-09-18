@@ -47,6 +47,12 @@ public class DraftController : ControllerBase
             return NotFound("No season exists yet.");
         }
 
+        var completedGames = await _db.Matches.CountAsync(m => m.SeasonId == season.Id);
+        if (!SeasonPhaseCalculator.IsRegularSeasonComplete(season, completedGames))
+        {
+            return Conflict("The rookie draft opens once the regular season is complete.");
+        }
+
         var teamIds = await _db.Teams.Select(t => t.Id).ToListAsync();
         var draftOrder = DraftOrderCalculator.FromStandings(season.Standings, teamIds);
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import type { PlayerDto, RosterEntry, TeamSummary } from "../types";
 
-export function MarketView({ teams, teamId }: { teams: TeamSummary[]; teamId: string }) {
+export function MarketView({ teams, teamId, seasonComplete }: { teams: TeamSummary[]; teamId: string; seasonComplete: boolean }) {
   const [freeAgents, setFreeAgents] = useState<PlayerDto[]>([]);
   const [status, setStatus] = useState<string | null>(null);
   const [offerGold, setOfferGold] = useState(100);
@@ -64,6 +64,9 @@ export function MarketView({ teams, teamId }: { teams: TeamSummary[]; teamId: st
     <div className="market-view">
       <section>
         <h3>Free Agents</h3>
+        {!seasonComplete && (
+          <p className="hint">Free agency is an offseason event - signings open once every game in the regular season has been played. Browse below, but signing is locked until then.</p>
+        )}
         <div className="call-sheet-header">
           <label>
             Offer: Gold/yr{" "}
@@ -100,7 +103,9 @@ export function MarketView({ teams, teamId }: { teams: TeamSummary[]; teamId: st
                 <td>{p.awareness}</td>
                 <td>{p.durability}</td>
                 <td>
-                  <button onClick={() => handleSign(p.id)}>Sign</button>
+                  <button disabled={!seasonComplete} onClick={() => handleSign(p.id)}>
+                    Sign
+                  </button>
                 </td>
               </tr>
             ))}

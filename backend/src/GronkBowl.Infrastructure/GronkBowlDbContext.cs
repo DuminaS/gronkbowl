@@ -17,6 +17,7 @@ public class GronkBowlDbContext : DbContext
     public DbSet<Match> Matches => Set<Match>();
     public DbSet<League> Leagues => Set<League>();
     public DbSet<DraftState> DraftStates => Set<DraftState>();
+    public DbSet<PlaybookFolder> PlaybookFolders => Set<PlaybookFolder>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,6 +29,7 @@ public class GronkBowlDbContext : DbContext
         ConfigureMatch(modelBuilder);
         ConfigureLeague(modelBuilder);
         ConfigureDraftState(modelBuilder);
+        ConfigurePlaybookFolder(modelBuilder);
     }
 
     private static void ConfigurePlayer(ModelBuilder modelBuilder)
@@ -128,6 +130,17 @@ public class GronkBowlDbContext : DbContext
             entity.Property(d => d.PickOrder).AsJson();
             entity.Property(d => d.ProspectPlayerIds).AsJson();
             entity.Property(d => d.DraftedProspectPlayerIds).AsJson();
+        });
+    }
+
+    private static void ConfigurePlaybookFolder(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<PlaybookFolder>(entity =>
+        {
+            entity.HasKey(f => f.Id);
+            entity.Property(f => f.Category).HasConversion<string>();
+            entity.Property(f => f.PlayIds).AsJson();
+            entity.HasIndex(f => f.TeamId);
         });
     }
 }

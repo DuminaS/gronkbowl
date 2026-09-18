@@ -157,6 +157,23 @@ th {
   font-size: 13px;
 }
 
+.folder-name-input {
+  font-family: var(--heading);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border: none;
+  background: transparent;
+  color: var(--text-h);
+  padding: 2px 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.folder-name-input:focus {
+  outline: 1px solid var(--accent-border);
+}
+
 .call-sheet-header {
   display: flex;
   align-items: center;
