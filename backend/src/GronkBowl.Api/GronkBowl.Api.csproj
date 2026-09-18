@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.20" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GronkBowl.Domain\GronkBowl.Domain.csproj" />
+    <ProjectReference Include="..\GronkBowl.Engine\GronkBowl.Engine.csproj" />
+    <ProjectReference Include="..\GronkBowl.Infrastructure\GronkBowl.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
